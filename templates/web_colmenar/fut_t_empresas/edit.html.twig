@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ title_general }} {% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+    <div class="container">
+        <h1>Editar Empresa</h1>
+
+        {{ include('web_colmenar/fut_t_empresas/_form.html.twig', {'button_label': 'Guardar'}) }}
+
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

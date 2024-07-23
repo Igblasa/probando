@@ -1,0 +1,114 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ title_general }} {% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+    <div class="row justify-content-center">
+        <div class="col-11">
+            
+            <div class="row justify-content-end mb-4">
+                <div class="col-md-8">
+                    <h3 class="mb-4">{{ titulo }}</h3>
+                </div>
+                <div class="col-md-4 py-2 px-2 bg-light rounded border">
+                    <div>
+                        <h5 class="text-center py-2 px-2">Datos</h5>
+                        <hr>
+                        <div class="text-center">
+                            <a href="{{ path('app_fut_t_cronicas_semana_actual') }}" class="btn btn-outline-primary ml-3 mb-2 {% if filtro == 'semana' %}active{% endif %}">Semana actual</a>
+                            <a href="{{ path('app_fut_t_cronicas_mes_actual') }}" class="btn btn-outline-warning ml-3 mb-2 {% if filtro == 'mes' %}active{% endif %}">Último mes</a>
+                            <a href="{{ path('app_fut_t_cronicas_temporada_actual') }}" class="btn btn-outline-danger ml-3 mb-2 {% if filtro == 'temporada' %}active{% endif %}">Temporada actual</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table" id="tbl-cronicas">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Fecha</th>
+                            <th class="text-center">Horario</th>
+                            <th>Equipo</th>
+                            <th>Rival</th>
+                            <th class="text-center">Resultado</th>
+                            <th>Estadio</th>
+                            <th class="text-center">MVP</th>
+                            <th class="text-center">MVP de la Semana</th>
+                            <th class="text-center">Goleadores</th>
+                            <th class="text-center">Fotos</th>
+                            <th class="text-center">Publicado en Redes</th>
+                            <th class="text-center">Enviado por Whatsapp</th>
+                            <th class="text-center">Añadir Crónica</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for partido in partidos %}
+                            <tr>
+                                <td class="text-center">{{ partido.fecha }}</td>
+                                <td class="text-center">{{ partido.horario ? partido.horario|date('H:i') : 'N/A' }}</td>
+                                {% if partido.local == 'no' %}
+                                    <td>{{ partido.rival }}</td>
+                                    <td>{{ partido.equipo }}</td>
+                                {% else %}
+                                    <td>{{ partido.equipo }}</td>
+                                    <td>{{ partido.rival }}</td>
+                                {% endif %}
+                                <td class="text-center">{{ partido.resultado_local }} - {{ partido.resultado_visitante }}</td>
+                                <td>{{ partido.nombre_estadio }}</td>
+                                <td class="text-center">{{ partido.mvp }}</td>
+                                <td class="text-center">{{ partido.mvp_semana }}</td>
+                                <td class="text-center">{{ partido.goleadores }}</td>
+                                <td class="text-center">
+                                    {% if partido.tiene_fotos > 0 %}
+                                        Sí
+                                    {% else %}
+                                        No
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">{{ partido.publicado_en_redes }}</td>
+                                <td class="text-center">{{ partido.enviado_whatsapp }}</td>
+                                <td class="text-center">
+                                    {% if partido.texto_cronica %}
+                                        <a href="{{ path('app_fut_t_cronicas_add', {'id_partido': partido.id_partido}) }}"
+                                           class="text-success fw-bold">Editar Crónica</a>
+                                    {% else %}
+                                        <a href="{{ path('app_fut_t_cronicas_add', {'id_partido': partido.id_partido}) }}"
+                                           class="text-danger fw-bold">Añadir Crónica</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <!-- No es necesario un mensaje aquí, DataTables lo manejará -->
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    
+    <script>
+        
+        jQuery(document).ready(function ($) {
+            $('#tbl-cronicas').DataTable({
+                searching: true,
+                paging: true,
+                order: [],
+                language: {
+                    emptyTable: "No se encontraron registros"
+                }
+            });
+        });
+        
+    </script>
+    
+{% endblock %}

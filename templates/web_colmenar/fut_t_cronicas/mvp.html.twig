@@ -1,0 +1,113 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+    <div class="row justify-content-center">
+        <div class="col-11">
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <h3 class="mb-4">{{ title }}</h3>
+                    <hr>
+                </div>
+                <div class="col-md-4 bg-light border rounded py-3 px-3">
+                    <h5 class="text-center">Elige una semana</h5>
+                    <hr>
+                    <select id="week-select" class="form-select">
+                        {% for week in weeks %}
+                            <option value="{{ path('app_fut_t_cronicas_mvp_week', {'week': week.week_range}) }}" {% if week.week_range == selectedWeek %}selected{% endif %}>
+                                {{ week.week_range }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            {% if partidos is not empty %}
+                <div class="table-responsive">
+                    <table class="table" id="tbl-cronicas">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Fecha</th>
+                                <th>Equipo</th>
+                                <th>Tipo de Equipo</th>
+                                <th class="text-center">MVP</th>
+                                <th class="text-center">MVP de la Semana</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for partido in partidos %}
+                                <tr>
+                                    <td class="text-center">{{ partido.fecha|date('d-m-Y') }}</td>
+                                    <td>{{ partido.equipo }}</td>
+                                    <td>{{ partido.tipo_equipo }}</td>
+                                    <td class="text-center">{{ partido.mvp }}</td>
+                                    <td class="text-center">{{ partido.mvp_semana }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center" role="alert">
+                    No se encontraron registros para la semana seleccionada.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        jQuery(document).ready(function ($) {
+            {% if partidos is not empty %}
+                var table = $('#tbl-cronicas').DataTable({
+                    searching: true,
+                    paging: true,
+                    pageLength: 100,
+                    order: [],
+                    columnDefs: [
+                        { "visible": false, "targets": 2 }
+                    ],
+                    drawCallback: function (settings) {
+                        var api = this.api();
+                        var rows = api.rows({ page: 'current' }).nodes();
+                        var last = null;
+
+                        api.column(2, { page: 'current' }).data().each(function (group, i) {
+                            if (last !== group) {
+                                $(rows).eq(i).before(
+                                    '<tr class="group"><td colspan="5" class="bg-warning fw-bold text-uppercase">' + group + '</td></tr>'
+                                );
+                                last = group;
+                            }
+                        });
+                    },
+                    language: {
+                        emptyTable: "No se encontraron registros"
+                    }
+                });
+
+                // Order by the grouping
+                $('#tbl-cronicas tbody').on('click', 'tr.group', function () {
+                    var currentOrder = table.order()[0];
+                    if (currentOrder[0] === 2 && currentOrder[1] === 'asc') {
+                        table.order([2, 'desc']).draw();
+                    } else {
+                        table.order([2, 'asc']).draw();
+                    }
+                });
+            {% endif %}
+
+            $('#week-select').on('change', function () {
+                window.location.href = $(this).val();
+            });
+        });
+    </script>
+{% endblock %}

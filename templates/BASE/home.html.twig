@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ title_general }} {% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .welcome-section {
+            margin-top: 50px;
+        }
+        .logo {
+            max-width: 150px;
+        }
+        .user-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .btn-custom {
+            background-color: #007bff;
+            border: none;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+        .text-shadow {
+            text-shadow: 6px 6px 4px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+
+    <div class="container welcome-section">
+        <div class="row justify-content-center">
+            <div class="col-12 text-center mb-5">
+                <img class="mb-4 logo rounded" src="{{ app.request.getSchemeAndHttpHost() ~ asset('imagenes/logo_igblasa_portada.png') }}" alt="Logo Igblasa">
+                <h2 class="display-4 font-weight-bold text-shadow">Bienvenido a {{ title_general }}</h2>
+                <hr class="my-4">
+                {% if user %}
+                    <h5 class="font-weight-bold">¡Hola, {{ user.username }}!</h5>
+                    <img src="{{ user.imagen }}" class="img-thumbnail user-image" alt="{{ user.username }}">
+                {% else %}
+                    <p>No hay usuario autenticado.</p>
+                {% endif %}
+                <hr>
+                <div>
+                    {% if is_granted('ROLE_USER') %}
+                        <a href="{{ url('app_user_solicitar_permisos') }}" class="btn btn-primary btn-lg btn-custom">Solicitar Permisos</a>
+                    {% endif %}
+                </div>
+            </div>
+
+                    
+                    
+            
+            
+
+
+
+            
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}
+

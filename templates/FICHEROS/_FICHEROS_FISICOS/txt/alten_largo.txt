@@ -1,0 +1,11 @@
+<hola>
+	<hola1>
+		texto dentro de hola
+	</hola1>
+	<hola1>
+		aaaaaaa
+	</hola1>
+	<adios>
+	adasdf
+	</adios>
+</hola>

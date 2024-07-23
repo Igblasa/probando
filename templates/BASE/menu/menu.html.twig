@@ -1,0 +1,115 @@
+<aside id="sidebar" class="sidebar break-point-lg has-bg-image">
+    <a id="btn-collapse" class="sidebar-collapser"><i class="ri-arrow-left-s-line"></i></a>
+    <div class="image-wrapper">
+        <img src="{{ asset('imagenes/sidebar-bg.jpg') }}" alt="sidebar background" />
+    </div>
+    <div class="sidebar-layout">
+        <div class="sidebar-header d-flex align-items-center justify-content-center">
+            <div class="pro-sidebar-logo">
+                <a href="{{ url('home')}}">
+                    <img class="rounded mx-1" src="{{ app.request.getSchemeAndHttpHost() ~ asset('imagenes/logo_igblasa_portada.png') }}" width="48px" height="48px">
+                </a>
+                <h5 class="title_general">{{ title_general }}</h5>
+            </div>
+        </div>
+        <hr>
+        
+        {% if app.user %}
+            <div class="my-2 mx-2 my-lg-0 border border-secondary py-2 px-2 rounded-lg text-center mr-4">
+                {% set emailParts = app.user.email|split('@') %}
+                <img src="{{ app.user.imagen }}" class="" alt="{{ app.user.username }}" style="width: 25px; height: 25px;">
+                <span class="text-white mx-2 font-weight-bold nombre_user"><em>{{ emailParts[0] | upper }}</em></span>
+            </div>
+            <hr>
+        
+        {% endif %}
+        <div class="sidebar-content">
+            <nav class="menu open-current-submenu">
+                <ul>
+                    <li class="menu-header"><span>GENERAL</span></li>
+
+                    {{ include('BASE/menu/usuarios.html.twig') }}
+                    {{ include('BASE/menu/ficheros.html.twig') }}
+                    {{ include('BASE/menu/colmenar.html.twig') }}
+
+                    <li class="menu-header" style="padding-top: 20px"><span>EXTRA</span></li>
+
+                    {% if is_granted('ROLE_NACHO') %}
+                        <li class="menu-item">
+                            <a href="{{ url('ruta_nutricion') }}">
+                                <span class="menu-icon">
+                                    <i class="ri-book-2-fill"></i>
+                                </span>
+                                <span class="menu-title">Nutricion</span>
+                                <span class="menu-suffix">
+                                    <span class="badge secondary">Beta</span>
+                                </span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    {% if is_granted('ROLE_NACHO') %}
+                        <li class="menu-item sub-menu">
+                            <a href="#" class="menu-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="menu-icon">
+                                    <i class="ri-global-fill"></i> <!-- Icono para el menú de idiomas -->
+                                </span>
+                                <span class="menu-title">
+                                    {% for idioma in idiomas_soportados %}
+                                        {% if app.request.getLocale() == idioma.idioma %}
+                                            {{ idioma.etiqueta | trans }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+                            </a>
+                            <div class="sub-menu-list dropdown-menu">
+                                <ul>
+                                    {% for idioma in idiomas_soportados %}
+                                        {% if app.request.getLocale() != idioma.idioma %}
+                                            <li class="menu-item">
+                                                <a href="{{ path('lang', {'_locale': idioma.idioma}) }}">
+                                                    <span class="menu-title">{{ idioma.etiqueta | trans }}</span>
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </li>
+                    {% endif %}
+
+
+                    
+                </ul>
+            </nav>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="footer-box">
+            <div>
+              <img
+                class="react-logo"
+                src="https://user-images.githubusercontent.com/25878302/213938106-ca8f0485-3f30-4861-9188-2920ed7ab284.png"
+                alt="react"
+              />
+            </div>
+            <div style="padding: 0 10px">
+              <span style="display: block; margin-bottom: 10px"
+                >Pro sidebar is also available as a react package
+              </span>
+              <div style="margin-bottom: 15px">
+                <img
+                  alt="preview badge"
+                  src="https://img.shields.io/github/stars/azouaoui-med/react-pro-sidebar?style=social"
+                />
+              </div>
+              <div>
+                <a href="https://github.com/azouaoui-med/react-pro-sidebar" target="_blank"
+                  >Check it out!</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+</aside>

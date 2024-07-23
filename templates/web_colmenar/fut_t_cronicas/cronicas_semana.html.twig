@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ title_general }} {% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+    <div class="row justify-content-center">
+        <div class="col-11">
+            <h1 class="mb-4">CRONICAS</h1>
+            <div class="table-responsive">
+                <table class="table" id="tbl-cronicas">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Equipo</th>
+                            <th>Rival</th>
+                            <th>Resultado</th>
+                            <th>Horario</th>
+                            <th>Estadio</th>
+                            <th>Añadir Crónica</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for partido in partidos %}
+                            <tr>
+                                <td>{{ partido.fecha }}</td>
+                                {% if partido.local == 'no' %}
+                                    <td>{{ partido.rival }}</td>
+                                    <td>{{ partido.equipo }}</td>
+                                {% else %}
+                                    <td>{{ partido.equipo }}</td>
+                                    <td>{{ partido.rival }}</td>
+                                {% endif %}
+                                <td>{{ partido.resultado_local }} - {{ partido.resultado_visitante }}</td>
+                                <td>{{ partido.horario ? partido.horario|date('H:i') : 'N/A' }}</td>
+                                <td>{{ partido.nombre_estadio }}</td>
+                                <td>
+                                    <a href="{{ path('app_fut_t_cronicas_add', {'id_partido': partido.id_partido}) }}">Añadir Crónica</a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <!-- No es necesario un mensaje aquí, DataTables lo manejará -->
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    
+    <script>
+        
+        jQuery(document).ready(function ($) {
+            $('#tbl-cronicas').DataTable({
+                searching: true,
+                paging: false,
+                order: [],
+                language: {
+                    emptyTable: "No se encontraron registros"
+                }
+            });
+        });
+        
+    </script>
+    
+{% endblock %}

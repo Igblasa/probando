@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ title_general }} {% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1>Nuevo estadio</h1>
+
+                {{ include('web_colmenar/fut_t_estadios/_form.html.twig') }}
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

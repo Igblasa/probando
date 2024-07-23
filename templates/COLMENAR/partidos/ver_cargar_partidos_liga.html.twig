@@ -1,0 +1,144 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ title_general }} {% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+    
+    <div class="row justify-content-around mb-5">
+        <div class="col-md-3 mb-3 bg-light p-3 mr-5 border rounded border-secondary">
+            <h3 class="text-center">Subir Archivo CSV</h3>
+            <hr>
+            <form method="post" action="{{ path('cargar_partidos_csv') }}" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="csv_file" class="form-label">Archivo CSV</label>
+                    <input type="file" class="form-control" id="csv_file" name="csv_file">
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Grabar</button>
+            </form>
+        </div>
+                
+        <div class="col-md-3 mb-3 bg-light p-3 mr-5 border rounded border-secondary">
+            <h3 class="text-center">Grabar partidos de liga</h3>
+            <hr>
+            <form method="post" action="{{ path('grabar_partidos_liga') }}">
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Grabar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+                
+    <div class="row justify-content-center">
+        
+        <div class="col-11">
+            <h2 class="mb-3">Partidos de Liga para cargar</h2>
+            <form method="post" action="{{ path('eliminar_partidos_csv') }}" id="formEliminar">
+                <button type="submit" class="btn btn-warning" onclick="confirmDeleteCsv()">Eliminar Datos</button>
+            </form>
+                <hr>
+                {% if partidosCsv is not defined or partidosCsv is empty %}
+                    <p>No hay datos cargados.</p>
+                {% else %}
+                <div class="table-responsive">
+                    <table class="table" id="partidosLigaTable">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Competicion</th>
+                                <th>Grupo</th>
+                                <th>Club casa</th>
+                                <th>Nombre casa</th>
+                                <th>Equipo casa</th>
+                                <th>Club visitante</th>
+                                <th>Nombre visitante</th>
+                                <th>Equipo visitante</th>
+                                <th>Campo</th>
+                                <th>Direccion Campo</th>
+                                <th>Jornada</th>
+                                <th>Resultado</th>
+                                <th>Codigo partido</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for partidoCsv in partidosCsv %}
+                                <tr>
+                                    <td>{{ partidoCsv.fecha | date('d-m-Y') }}</td>
+                                    <td>{{ partidoCsv.hora |date('H:i') }}</td>
+                                    <td>{{ partidoCsv.competicion }}</td>
+                                    <td>{{ partidoCsv.grupo }}</td>
+                                    <td>{{ partidoCsv.clubCasa }}</td>
+                                    <td>{{ partidoCsv.nombreClubCasa }}</td>
+                                    <td>{{ partidoCsv.equipoCasa }}</td>
+                                    <td>{{ partidoCsv.clubVisitante }}</td>
+                                    <td>{{ partidoCsv.nombreClubVisitante }}</td>
+                                    <td>{{ partidoCsv.EquipoVisitante }}</td>
+                                    <td>{{ partidoCsv.campo }}</td>
+                                    <td>{{ partidoCsv.direccionCampo }}</td>
+                                    <td>{{ partidoCsv.jornada }}</td>
+                                    <td>{{ partidoCsv.resultado }}</td>
+                                    <td>{{ partidoCsv.codigoPartido }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>    
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    
+    <script>
+        
+    $(document).ready(function() {
+        var dataTable = $('#partidosLigaTable').DataTable({
+            columns: [
+                { data: 'fecha' },
+                { data: 'hora' },
+                { data: 'competicion' },
+                { data: 'grupo' },
+                { data: 'clubCasa' },
+                { data: 'nombreClubCasa' },
+                { data: 'equipoCasa' },
+                { data: 'clubVisitante' },
+                { data: 'nombreClubVisitante' },
+                { data: 'EquipoVisitante' },
+                { data: 'campo' },
+                { data: 'direccionCampo' },
+                { data: 'jornada' },
+                { data: 'resultado' },
+                { data: 'codigoPartido' },
+            ],
+            lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, 'All']
+            ],
+            order: [[0, 'asc']], // Ordenar por nombre de archivo de forma ascendente
+            paging: true, // Habilitar paginación
+            pageLength: 50, // Cantidad de registros por página
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ],
+        });
+    });
+    
+    function confirmDeleteCsv() {
+        if (confirm("¿Estás seguro de que quieres eliminar los datos?")) {
+            window.location.href = "{{ path('eliminar_partidos_csv') }}";
+        } else {
+            event.preventDefault();
+        }
+    }
+        
+    </script>
+    
+{% endblock %}

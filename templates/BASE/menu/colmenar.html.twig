@@ -1,0 +1,101 @@
+{% if is_granted('ROLE_SUPER_COLMENAR') %}
+    <li class="menu-item sub-menu">
+        <a href="#">
+            <span class="menu-icon">
+                <i class="ri-vip-diamond-fill"></i>
+            </span>
+            <span class="menu-title">COLMENAR</span>
+        </a>
+        <div class="sub-menu-list">
+            <ul>
+                <li class="menu-item sub-menu">
+                    <a href="#">
+                        <span class="menu-title">Partidos</span>
+                    </a>
+                    <div class="sub-menu-list">
+                        <ul>
+                            <li class="menu-item">
+                                <a href="{{ url('ver_todos_los_partidos') }}">
+                                    <span class="menu-title">Estadísticas de partidos</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="{{ url('ver_cargar_partidos_liga') }}">
+                                    <span class="menu-title">Carga de partidos de liga</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="menu-item sub-menu">
+                    <a href="#">
+                        <span class="menu-title">Cronicas</span>
+                    </a>
+                    <div class="sub-menu-list">
+                        <ul>
+                            <li class="menu-item">
+                                <a href="{{ url('app_fut_t_cronicas_semana') }}">
+                                    <span class="menu-title">Cronicas para entrenadores</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="{{ url('app_fut_t_cronicas_semana_actual') }}">
+                                    <span class="menu-title">Cronicas para mi</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="{{ url('app_fut_t_fotos_de_cronicas') }}">
+                                    <span class="menu-title">Fotos de cronicas</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="menu-item sub-menu">
+                    <a href="#">
+                        <span class="menu-title">Club</span>
+                    </a>
+                    <div class="sub-menu-list">
+                        <ul>
+                            <li class="menu-item">
+                    <a href="{{ url('app_fut_u_equipos_rivales_index') }}">
+                        <span class="menu-title">Partidos</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ url('app_fut_t_equipos_index') }}">
+                        <span class="menu-title">Equipos</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ url('app_fut_t_rivales_index') }}">
+                        <span class="menu-title">Rivales</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ url('app_fut_t_estadios_index') }}">
+                        <span class="menu-title">Estadios</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ url('app_fut_t_empresas_index') }}">
+                        <span class="menu-title">Empresas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ url('app_fut_t_cargar_jugadores') }}">
+                        <span class="menu-title">Cargar Jugadores</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ url('app_fut_t_cronicas_mvp') }}">
+                        <span class="menu-title">MVP - Jugador de la Semana</span>
+                    </a>
+                </li>
+                        </ul>
+                    </div>
+                </li> 
+            </ul>
+        </div>
+    </li>
+{% endif %}

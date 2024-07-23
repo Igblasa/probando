@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ title_general }} {% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+    <div class="container">
+        <h1>Nuevo partido</h1>
+        <hr>
+        {{ include('web_colmenar/fut_u_equipos_rivales/_form.html.twig') }}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            // Inicializar el combo de equipos con Select2
+            $("#fut_u_equipos_rivales_id_equipo, #fut_u_equipos_rivales_id_rival, #fut_u_equipos_rivales_id_estadio").select2({
+                
+            });
+        });
+    </script>
+{% endblock %}
+

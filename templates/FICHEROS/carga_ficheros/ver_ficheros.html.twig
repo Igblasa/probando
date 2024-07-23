@@ -1,0 +1,156 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ title_general }} {% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .highlight {
+            background-color: yellow;
+        }
+        #modal .modal-body {
+            max-height: 600px; /* Establece la altura máxima que desees */
+            overflow-y: auto; /* Habilita la barra de desplazamiento vertical cuando sea necesario */
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+    
+    <div class="row justify-content-center">
+        <div class="col-md-4 mb-3 bg-light p-3 mr-5 border rounded border-secondary">
+            <h2 class="mb-3 text-center">Cargar Archivos</h2>
+            <hr>
+            <form action="{{ path('cargar_ficheros') }}" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <input type="file" name="archivos[]" multiple class="form-control-file" required>
+                </div>
+                <button type="submit" class="btn btn-primary col-6 btn-block mx-auto  btn-block my-3">Cargar</button>
+            </form>
+        </div>
+    </div>
+                
+    <hr class="my-4">     
+                
+    <div class="row justify-content-center">
+        <div class="col-11">
+            <h2 class="mb-3">Archivos Cargados</h2>
+            <div class="table-responsive">
+                <table class="table" id="archivosTable">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Extensión</th>
+                            <th>Tamaño</th>
+                            <th>Ruta</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fichero in ficheros %}
+                            <tr>
+                                <td>{{ fichero.nombre }}</td>
+                                <td>{{ fichero.extension }}</td>
+                                <td>{{ (fichero.tamaño / 1024 / 1024)|round(2) }} MB</td>
+                                <td>{{ fichero.ruta }}</td>
+                                <td>
+                                    <a href="{{ path('descargar_fichero', {'id': fichero.id}) }}" class="btn btn-primary">Descargar</a>
+                                    <a href="{{ path('eliminar_fichero', { 'id': fichero.id }) }}" class="btn btn-danger" onclick="return confirmarEliminar();">Eliminar</a>
+                                    {% if fichero.extension in arrayExtensionesLeer %}
+                                        <a href="{{ path('leer_fichero', {'id': fichero.id}) }}" class="btn btn-info btn-leerFichero">Leer</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>    
+    {{ include('FICHEROS/carga_ficheros/modal_leer_fichero.html.twig') }}
+                    
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    
+    <script>
+        
+        $(document).ready(function() {
+            
+            var dataTable = $('#archivosTable').DataTable({
+                columns: [
+                    { data: 'nombre' },
+                    { data: 'extension' },
+                    { data: 'tamaño' },
+                    { data: 'ruta' },
+                    { data: '' },
+                ],
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, 'All']
+                ],
+                order: [[0, 'asc']], // Ordenar por nombre de archivo de forma ascendente
+                paging: true, // Habilitar paginación
+                pageLength: 25, // Cantidad de registros por página
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ],
+            });
+            
+            $('.btn-leerFichero').click(function (e) {
+                e.preventDefault();
+                var url = $(this).attr('href');
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.texto) {
+                            $('#searchInput').val('');
+                            fileContent = data.texto;
+                            $('#fileContent').text(fileContent);
+                            $('#modal').modal('show');
+                        } else {
+                            alert(data.error);
+                        }
+                    },
+                    error: function () {
+                        alert('Se ha producido un error al obtener el contenido del fichero.');
+                    }
+                });
+            });
+            
+            // Establecer el mínimo de caracteres requeridos para buscar
+            var minCaracteresParaBuscar = 3;
+
+            // Manejar la búsqueda en tiempo real
+            $('#searchInput').on('input', function () {
+                var searchTerm = $(this).val();
+                // Verificar si la longitud del término de búsqueda es suficiente
+                if (searchTerm.length >= minCaracteresParaBuscar) {
+                    if (typeof fileContent === 'string') {
+                        var regex = new RegExp(searchTerm, 'ig');
+                        var highlightedContent = fileContent.replace(regex, function (match) {
+                            return '<span class="highlight">' + match + '</span>';
+                        });
+                        $('#fileContent').html(highlightedContent);
+                    } else {
+                        // Si fileContent no es una cadena de texto válida, muestra un mensaje de error o maneja la situación de manera adecuada
+                        $('#fileContent').html('El contenido no está disponible.');
+                    }
+                } else {
+                    // Si no se cumplen los requisitos mínimos de caracteres, muestra un mensaje o realiza otra acción apropiada
+                    $('#fileContent').html('Introduce al menos ' + minCaracteresParaBuscar + ' caracteres para buscar.');
+                }
+            });
+        
+        });
+        
+        function confirmarEliminar() {
+            return confirm('¿Estás seguro de que deseas eliminar este fichero?');
+        }
+
+    </script>
+{% endblock %}

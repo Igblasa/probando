@@ -1,0 +1,393 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ title_general }} {% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+    
+    <div class="row justify-content-around">
+        <div class="col-md-4 mb-3 ml-3 bg-light p-3 mr-5 border rounded border-secondary">
+            <form action="{{ path('cargar_partidos_data') }}" method="post">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label" for="fechaInicio">Fecha de inicio:</label>
+                        <input type="date" id="fechaInicio" name="fechaInicio" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="fechaFin">Fecha de fin:</label>
+                        <input type="date" id="fechaFin" name="fechaFin" class="form-control">
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-md-4 col-md-offset-3">
+                        <button type="submit" class="btn btn-primary btn-block mt-3">Cargar Datos</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-md-7 mb-3 bg-light p-3 border border-secondary rounded">
+            <form id="filtroForm">
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label for="equipo" class="form-label mr-2">Seleccionar equipo:</label>
+                        <select name="equipo[]" id="equipo" class="form-control">
+                            {% for equipo in equipos %}
+                                <option value="{{ equipo.equipo }}">{{ equipo.equipo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label for="rival" class="form-label ml-3 mr-2">Rival:</label>
+                        <select id="rival" name="rival[]" class="form-control">
+                            {% for rival in rivales %}
+                                <option value="{{ rival.rival }}">{{ rival.rival }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="form-group col-6">
+                        <label for="fechaInicio" class="form-label mr-2">Fecha de inicio:</label>
+                        <input type="date" id="fechaInicio" name="fechaInicio" class="form-control">
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="fechaFin" class="form-label mr-2">Fecha de fin:</label>
+                        <input type="date" id="fechaFin" name="fechaFin" class="form-control">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-6">
+                        <label for="limiteRegistros" class="form-label">Límite de Registros:</label>
+                        <input type="number" id="limiteRegistros" name="limiteRegistros" value="100" class="form-control">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-5">
+                        <button type="button" id="filtrarBtn" class="btn btn-primary btn-block mt-3">Filtrar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <hr class="my-4">
+
+    {# Mensaje flash de éxito si existe #}
+    {% for flashMessage in app.flashes('success') %}
+        <div class="container-fluid">
+            <div class="mt-3 alert flash-success alert alert-success rounded border shadow alert-dismissible fade show" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <p class="font-weight-bold">{{ flashMessage }}</p>
+            </div>
+        </div>
+    {% endfor %}
+    
+    <div class="row justify-content-center">
+        <div class="col-11">
+            <h1 class="mb-4">Partidos</h1>
+            <div class="table-responsive">
+                <table class="table" id="partidosTable">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Equipo</th>
+                            <th>Rival</th>
+                            <th>Resultado Local</th>
+                            <th>Resultado Visitante</th>
+                            <th>Horario</th>
+                            <th>Local</th>
+                            <th>Nombre Estadio</th>
+                            <th>ID Partido</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for partido in partidos %}
+                            <tr>
+                                <td>{{ partido.fecha|date('Y-m-d') }}</td>
+                                <td>{{ partido.equipo }}</td>
+                                <td>{{ partido.rival }}</td>
+                                <td>{{ partido.resultadoLocal }}</td>
+                                <td>{{ partido.resultadoVisitante }}</td>
+                                <td>{{ partido.horario|date('H:i') }}</td>
+                                <td>{{ partido.local }}</td>
+                                <td>{{ partido.nombreEstadio }}</td>
+                                <td>{{ partido.idPartido }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+            
+    <div class="row justify-content-around mt-4">
+        
+        <div class="col-md-5 bg-light p-3 border rounded border-secondary">
+            <canvas id="graficoPuntosPorEquipo">
+                <!-- ... contenido de la tabla ... -->
+            </canvas>
+        </div>
+        
+        <div class="col-md-5 bg-light p-3 border rounded border-secondary">
+            <div class="row justify-content-center">
+                <div class="col-8 text-center">
+                    <div id="datosPartidosGanadosEmpatadosPerdidos" class="bg-light mt-3 py-3 px-3 rounded-lg border"></div>
+                </div>
+                <div class="col-12">
+                    <canvas id="graficoPartidosGanadosEmpatadosPerdidos"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        
+    $(document).ready(function() {
+        // Configurar DataTables
+        var dataTable = $('#partidosTable').DataTable({
+            columns: [
+                { data: 'fecha' },
+                { data: 'equipo' },
+                { data: 'rival' },
+                { data: 'resultadoLocal' },
+                { data: 'resultadoVisitante' },
+                { data: 'horario' },
+                { data: 'local' },
+                { data: 'nombreEstadio' },
+                { data: 'idPartido' },
+            ],
+            lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, 'All']
+            ],
+            order: [[0, 'desc']], // Ordenar por fecha de forma descendente
+            paging: true, // Habilitar paginación
+            pageLength: 10, // Cantidad de registros por página
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ],
+        });
+
+        // Generar el gráfico de contador de partidos por fechas
+        function getPuntosPorEquipo(datosPartidos) {
+            // Calcular los puntos por equipo
+            var puntosPorEquipo = {};
+
+            datosPartidos.forEach(partido => {
+                var equipo = partido.equipo;
+                var puntos = 0;
+
+                if (partido.local === "si") {
+                    // El equipo es local
+                    if (partido.resultadoLocal > partido.resultadoVisitante) {
+                        puntos = 3; // Victoria (3 puntos)
+                    } else if (partido.resultadoLocal === partido.resultadoVisitante) {
+                        puntos = 1; // Empate (1 punto)
+                    }
+                } else if (partido.local === "no") {
+                    // El equipo es visitante
+                    if (partido.resultadoVisitante > partido.resultadoLocal) {
+                        puntos = 3; // Victoria (3 puntos)
+                    } else if (partido.resultadoVisitante === partido.resultadoLocal) {
+                        puntos = 1; // Empate (1 punto)
+                    }
+                }
+
+                // Agregar los puntos al equipo correspondiente en el objeto
+                if (puntosPorEquipo[equipo]) {
+                    puntosPorEquipo[equipo] += puntos;
+                } else {
+                    puntosPorEquipo[equipo] = puntos;
+                }
+            });
+
+            return puntosPorEquipo;
+        }
+
+        // Función para generar el gráfico de puntos por equipo
+        function drawPuntosPorEquipoChart(puntosPorEquipo) {
+            // Convertir los datos en arrays para el gráfico
+            var equipos = Object.keys(puntosPorEquipo);
+            var puntos = Object.values(puntosPorEquipo);
+
+            // Destruir el gráfico anterior si existe
+            if (typeof puntosPorEquipoChart !== 'undefined') {
+                puntosPorEquipoChart.destroy();
+            }
+
+            // Generar el gráfico de puntos por equipo
+            var ctx = document.getElementById('graficoPuntosPorEquipo').getContext('2d');
+            puntosPorEquipoChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: equipos,
+                    datasets: [{
+                        label: 'Puntos por Equipo',
+                        data: puntos,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Llamada inicial para generar los gráficos al cargar la página
+        var puntosPorEquipoInicial = getPuntosPorEquipo({{ partidos|json_encode()|raw }});
+        drawPuntosPorEquipoChart(puntosPorEquipoInicial);
+        
+        var partidosDataInicial = getPartidosGanadosEmpatadosPerdidos({{ partidos|json_encode()|raw }});
+        drawPartidosGanadosEmpatadosPerdidosChart(partidosDataInicial);
+
+        function getPartidosGanadosEmpatadosPerdidos(datosPartidos) {
+            var partidosGanados = 0;
+            var partidosEmpatados = 0;
+            var partidosPerdidos = 0;
+
+            datosPartidos.forEach(partido => {
+                if (partido.local === "si") {
+                    // El equipo es local
+                    if (partido.resultadoLocal > partido.resultadoVisitante) {
+                        partidosGanados++;
+                    } else if (partido.resultadoLocal === partido.resultadoVisitante) {
+                        partidosEmpatados++;
+                    } else {
+                        partidosPerdidos++;
+                    }
+                } else if (partido.local === "no") {
+                    // El equipo es visitante
+                    if (partido.resultadoVisitante > partido.resultadoLocal) {
+                        partidosGanados++;
+                    } else if (partido.resultadoVisitante === partido.resultadoLocal) {
+                        partidosEmpatados++;
+                    } else {
+                        partidosPerdidos++;
+                    }
+                }
+            });
+
+            return {
+                ganados: partidosGanados,
+                empatados: partidosEmpatados,
+                perdidos: partidosPerdidos
+            };
+        }
+        
+        function drawPartidosGanadosEmpatadosPerdidosChart(partidosData) {
+            
+        // Destruir el gráfico existente si hay uno
+            if (typeof partidosGanadosEmpatadosPerdidosChart !== 'undefined') {
+                partidosGanadosEmpatadosPerdidosChart.destroy();
+            }
+
+            var ctx = document.getElementById('graficoPartidosGanadosEmpatadosPerdidos').getContext('2d');
+
+            partidosGanadosEmpatadosPerdidosChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Ganados', 'Empatados', 'Perdidos'],
+                    datasets: [{
+                        data: [
+                            partidosData.ganados,
+                            partidosData.empatados,
+                            partidosData.perdidos
+                        ],
+                        backgroundColor: ['green', 'yellow', 'red']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    title: {
+                        display: true,
+                        text: 'Partidos Ganados, Empatados y Perdidos'
+                    },
+                    legend: {
+                        display: false, // No mostrar la leyenda
+                    },
+                }
+            });
+
+            // Mostrar los números de partidos ganados, empatados y perdidos en un div separado
+            var divDatos = document.getElementById('datosPartidosGanadosEmpatadosPerdidos');
+            divDatos.innerHTML = `
+                <p><span class="font-weight-bold">Ganados:</span> ${partidosData.ganados} - <span class="font-weight-bold">Empatados:</span>: ${partidosData.empatados} - <span class="font-weight-bold">Perdidos:</span>: ${partidosData.perdidos}</p>
+            `;
+        }
+
+        // Llamada inicial para generar los gráficos al cargar la página
+        getPuntosPorEquipo({{ partidos|json_encode()|raw }});
+        getPartidosGanadosEmpatadosPerdidos({{ partidos|json_encode()|raw }});
+
+        // Manejador del evento click para el botón "Filtrar"
+        $("#filtrarBtn").click(function() {
+            // Obtener los valores de los combos de filtrado
+            var equipo = $("#equipo").val();
+            var rival = $("#rival").val();
+            var fechaInicio = $("#fechaInicio").val();
+            var fechaFin = $("#fechaFin").val();
+            var limiteRegistros = $("#limiteRegistros").val();
+
+            // Realizar la petición AJAX para obtener los datos filtrados
+            $.ajax({
+                url: "{{ path('ver_todos_los_partidos') }}",
+                method: "GET",
+                data: {
+                    equipo: equipo,
+                    rival: rival,
+                    fechaInicio: fechaInicio,
+                    fechaFin: fechaFin,
+                    limiteRegistros: limiteRegistros
+                },
+                dataType: "json",
+                success: function(data) {
+                    // Limpiar la tabla antes de agregar los nuevos datos
+                    dataTable.clear().draw();
+
+                    // Agregar los datos filtrados al DataTables
+                    dataTable.rows.add(data).draw();
+
+                    // Actualizar el gráfico de puntos por equipo con los nuevos datos
+                    var puntosPorEquipoFiltrado = getPuntosPorEquipo(data);
+                    drawPuntosPorEquipoChart(puntosPorEquipoFiltrado);
+
+                    // Actualizar el gráfico de tarta con los nuevos datos
+                    var partidosDataFiltrado = getPartidosGanadosEmpatadosPerdidos(data);
+                    drawPartidosGanadosEmpatadosPerdidosChart(partidosDataFiltrado);
+                },
+                error: function() {
+                    alert("Error al cargar los datos filtrados.");
+                }
+            });
+        });
+        
+        // Inicializar el combo de equipos con Select2
+        $("#equipo, #rival").select2({
+            allowClear: true,
+            multiple: true // Habilitar selección múltiple
+        });
+
+    });
+        
+    </script>
+    
+{% endblock %}

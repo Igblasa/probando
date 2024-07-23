@@ -1,0 +1,49 @@
+{{ form_start(form) }}
+
+<div class="row mb-3">
+    <div class="form-group col-lg-6">
+        {{ form_label(form.nombre_estadio, 'Nombre del Estadio', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.nombre_estadio, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    <div class="form-group col-lg-6">
+        {{ form_label(form.direccion, 'Dirección', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.direccion, {'attr': {'class': 'form-control'}}) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="form-group col-lg-6">
+        {{ form_label(form.codigo_fed, 'Código Fed', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.codigo_fed, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    <div class="form-group col-lg-6">
+        {{ form_label(form.nombre_fed, 'Nombre Fed', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.nombre_fed, {'attr': {'class': 'form-control'}}) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="form-group col-lg-6">
+        {{ form_label(form.direccion_fed, 'Dirección Fed', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.direccion_fed, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    <div class="form-group col-lg-6">
+        {{ form_label(form.codigo_postal_fed, 'Código Postal Fed', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.codigo_postal_fed, {'attr': {'class': 'form-control'}}) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="form-group col-lg-6">
+        {{ form_label(form.provincia_fed, 'Provincia Fed', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.provincia_fed, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    <div class="form-group col-lg-6">
+        {{ form_label(form.localidad_fed, 'Localidad Fed', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.localidad_fed, {'attr': {'class': 'form-control'}}) }}
+    </div>
+</div>
+
+<button class="btn btn-primary">{{ button_label|default('Guardar') }}</button>
+
+{{ form_end(form) }}

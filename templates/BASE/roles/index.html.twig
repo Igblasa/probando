@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ title_general }} {% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+
+    <div class="row justify-content-center">
+        <div class="col-11">
+            <h1 class="mb-4">Roles</h1>
+            <p><a href="{{ path('app_roles_new') }}" class="btn btn-danger">Crear Rol</a></p>
+            <div class="table-responsive">
+                <table class="table" id="tbl-roles">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Nombre_role</th>
+                            <th>Descripcion</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for role in roles %}
+                            <tr>
+                                <td>{{ role.id }}</td>
+                                <td>{{ role.nombreRole }}</td>
+                                <td>{{ role.descripcion('_'~app.request.getLocale()) }}</td>
+                                <td>
+                                    <a href="{{ path('app_roles_show', {'id': role.id}) }}" class="btn btn-sm btn-primary">Show</a>
+                                    <a href="{{ path('app_roles_edit', {'id': role.id}) }}" class="btn btn-sm btn-success">Edit</a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4">No records found</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    
+    <script>
+        
+        jQuery(document).ready(function ($) {
+            
+            $('#tbl-roles').DataTable({
+                searching: true,
+            });
+            
+        })
+        
+    </script>
+    
+{% endblock %}
