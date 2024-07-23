@@ -1,4 +1,0 @@
-<form method="post" action="{{ path('app_fut_u_equipos_rivales_delete', {'id_partido': fut_u_equipos_rivales.idPartido}) }}" onsubmit="return confirm('¿Estas seguro de que quieres eliminar el partido?');">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ fut_u_equipos_rivales.idPartido) }}">
-    <button class="btn">Delete</button>
-</form>

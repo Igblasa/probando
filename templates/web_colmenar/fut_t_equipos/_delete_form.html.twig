@@ -1,4 +1,0 @@
-<form method="post" action="{{ path('app_fut_t_equipos_delete', {'id_equipo': fut_t_equipo.idEquipo}) }}" onsubmit="return confirm('Seguro que deseas eliminar?');">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ fut_t_equipo.idEquipo) }}">
-    <button class="btn btn-sm btn-danger my-2 mx-2">Eliminar</button>
-</form>
